@@ -1,4 +1,4 @@
-import { Intents, Message } from "discord.js";
+import { Intents, Message, ChannelData } from "discord.js";
 import { VIDS } from "./models/util";
 
 require("dotenv").config();
@@ -33,7 +33,7 @@ client.on("ready", () => {
 
 client.on("messageCreate", async (message: Message) => {
   let general = client.channels.cache.find(
-    (channel) => channel.name === settings.channel
+    (channel: ChannelData) => channel.name === settings.channel
   );
 
   if (message.content === "play") {
@@ -42,7 +42,7 @@ client.on("messageCreate", async (message: Message) => {
 
     let toPlay = VIDS[0];
 
-    let song = await queue.play(toPlay.Url).catch((_: any) => {});
+    await queue.play(toPlay.Url).catch((_: any) => {});
     if (toPlay) {
       setTimeout(function () {
         queue.stop();
