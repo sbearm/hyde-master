@@ -1,12 +1,12 @@
 import { Intents, Message } from "discord.js";
 import { VIDS } from "./models/util";
 
-module.exports = {
-  exec(msg: Message) {
-  },
-};
-
 require("dotenv").config();
+const { Player } = require("discord-music-player");
+
+module.exports = {
+  exec(msg: Message) {},
+};
 
 const Discord = require("discord.js");
 const client = new Discord.Client({
@@ -17,11 +17,10 @@ const client = new Discord.Client({
   ],
 });
 const settings = {
-  prefix: "!",
   token: process.env.TOKEN,
+  channel: process.env.CHANNEL,
 };
 
-const { Player } = require("discord-music-player");
 const player = new Player(client, {
   leaveOnEmpty: false,
 });
@@ -33,7 +32,9 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async (message: Message) => {
-  let general = client.channels.cache.get("286326310165413889");
+  let general = client.channels.cache.find(
+    (channel) => channel.name === settings.channel
+  );
 
   if (message.content === "play") {
     let queue = client.player.createQueue(message.guild.id);
