@@ -1,0 +1,29 @@
+{
+  "name": "hyde-master",
+  "version": "1.0.0",
+  "description": "funny discord bot",
+  "main": "bot.ts",
+  "scripts": {
+    "start": "ts-node src/Bot.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samuelbearman/hyde-master.git"
+  },
+  "author": "Samuel Bearman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/samuelbearman/hyde-master/issues"
+  },
+  "homepage": "https://github.com/samuelbearman/hyde-master#readme",
+  "dependencies": {
+    "discord-music-player": "^8.3.1",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.23",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.3"
+  }
+}
