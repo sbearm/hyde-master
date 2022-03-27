@@ -4,7 +4,7 @@
   "description": "funny discord bot",
   "main": "bot.ts",
   "scripts": {
-    "start": "ts-node src/Bot.ts"
+    "start": "ts-node src/bot.ts"
   },
   "repository": {
     "type": "git",
