@@ -1,3 +1,4 @@
+import { Queue } from "discord-music-player";
 import { Intents, Message, ChannelData, VoiceState } from "discord.js";
 import { BotConfig } from "./models";
 
@@ -26,6 +27,8 @@ const settings = {
 
 var botConfig: BotConfig;
 
+var guildQueue: Queue;
+
 const player = new Player(client, {
   leaveOnEmpty: false,
 });
@@ -43,7 +46,7 @@ client.on("ready", () => {
     res.on("end", () => {
       let config: BotConfig = JSON.parse(Buffer.concat(data).toString());
       botConfig = config;
-      console.log("Ready to go");
+      console.log('Ready to go')
     });
   });
 });
@@ -73,18 +76,26 @@ client.on("messageCreate", async (message: Message) => {
   );
 
   if (message.content === "play") {
-    let queue = client.player.createQueue(message.guild.id);
-    await queue.join(general);
-    queue.setVolume(70);
-
-    let toPlay = botConfig.Videos[0];
-
-    await queue.play(toPlay.Url);
-    if (toPlay) {
-      setTimeout(function () {
-        queue.stop();
-      }, toPlay.MsSeconds);
+    if (!guildQueue) {
+      guildQueue = client.player.createQueue(message.guild.id, {
+        leaveOnStop: false,
+      });
     }
+
+    await guildQueue.join(general);
+    guildQueue.setVolume(70);
+
+    let playUntil = botConfig.Videos[1];
+    await guildQueue.play(playUntil.Url);
+    if (playUntil) {
+      setTimeout(function () {
+        guildQueue.stop();
+      }, playUntil.MsSeconds);
+    }
+  }
+
+  if (message.content === "stop") {
+    guildQueue.stop();
   }
 });
 
