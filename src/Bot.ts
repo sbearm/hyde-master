@@ -36,17 +36,17 @@ const player = new Player(client, {
 client.player = player;
 
 client.on("ready", () => {
-  https.get(settings.gist, (res) => {
-    let data = [];
+  https.get(settings.gist, (res: any) => {
+    let data: any[] = [];
 
-    res.on("data", (chunk) => {
+    res.on("data", (chunk: any) => {
       data.push(chunk);
     });
 
     res.on("end", () => {
       let config: BotConfig = JSON.parse(Buffer.concat(data).toString());
       botConfig = config;
-      console.log('Ready to go')
+      console.log("Ready to go");
     });
   });
 });
@@ -77,17 +77,20 @@ client.on("messageCreate", async (message: Message) => {
 
   if (message.content === "play") {
     if (!guildQueue) {
-      guildQueue = client.player.createQueue(message.guild.id, {
-        leaveOnStop: false,
-      });
+      if (message.guild) {
+        guildQueue = client.player.createQueue(message.guild.id, {
+          leaveOnStop: false,
+        });
+      }
     }
 
     await guildQueue.join(general);
     guildQueue.setVolume(70);
 
-    let playUntil = botConfig.Videos[1];
-    await guildQueue.play(playUntil.Url);
-    if (playUntil) {
+    let playUntil = botConfig.Videos[2];
+    await guildQueue.play(playUntil.Url, { timecode: true });
+
+    if (playUntil && playUntil.MsSeconds) {
       setTimeout(function () {
         guildQueue.stop();
       }, playUntil.MsSeconds);
