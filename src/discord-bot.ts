@@ -16,13 +16,18 @@ const client = new Discord.Client({
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES,
     Intents.FLAGS.GUILD_VOICE_STATES,
+    Intents.FLAGS.DIRECT_MESSAGES,
+    Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
+    Intents.FLAGS.DIRECT_MESSAGE_TYPING,
   ],
+  partials: ["CHANNEL"],
 });
 
 const settings = {
   token: process.env.TOKEN,
   channel: process.env.CHANNEL,
   gist: process.env.GIST,
+  adminId: process.env.ADMINID,
 };
 
 var botConfig: BotConfig;
@@ -71,34 +76,35 @@ client.on(
 );
 
 client.on("messageCreate", async (message: Message) => {
-  let general = client.channels.cache.find(
-    (channel: ChannelData) => channel.name === settings.channel
-  );
+  if (message.channel.type == "DM" && message.author.id == settings.adminId) {
 
-  if (message.content === "play") {
-    if (!guildQueue) {
-      if (message.guild) {
-        guildQueue = client.player.createQueue(message.guild.id, {
+    let general = client.channels.cache.find(
+      (channel: ChannelData) => channel.name === settings.channel
+    );
+
+    if (message.content === "play") {
+      if (!guildQueue) {
+        guildQueue = client.player.createQueue(general.guild.id, {
           leaveOnStop: false,
         });
       }
+
+      await guildQueue.join(general);
+      guildQueue.setVolume(70);
+
+      let playUntil = botConfig.Videos[0];
+      await guildQueue.play(playUntil.Url, { timecode: true });
+
+      if (playUntil && playUntil.MsSeconds) {
+        setTimeout(function () {
+          guildQueue.stop();
+        }, playUntil.MsSeconds);
+      }
     }
 
-    await guildQueue.join(general);
-    guildQueue.setVolume(70);
-
-    let playUntil = botConfig.Videos[2];
-    await guildQueue.play(playUntil.Url, { timecode: true });
-
-    if (playUntil && playUntil.MsSeconds) {
-      setTimeout(function () {
-        guildQueue.stop();
-      }, playUntil.MsSeconds);
+    if (message.content === "stop") {
+      guildQueue.stop();
     }
-  }
-
-  if (message.content === "stop") {
-    guildQueue.stop();
   }
 });
 
