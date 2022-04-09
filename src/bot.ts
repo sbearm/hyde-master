@@ -89,8 +89,10 @@ client.on("messageCreate", async (message: Message) => {
     }
 
     if (args[0] === "refresh") {
+      console.log('refreshing config')
       getConfig(settings).then((data) => {
         botConfig = JSON.parse(JSON.stringify(data));
+        console.log(data)
       });
     }
   }

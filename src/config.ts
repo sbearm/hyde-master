@@ -1,11 +1,12 @@
 import { Axios } from "axios";
+const { randomUUID } = require("crypto");
 
 const axios: Axios = require("axios").default;
 
 export async function getConfig(settings: any) {
-  const response = await axios
-        .get(settings.gist, {
-            headers: { "Cache-Control": "no-cache" },
-        });
-    return response.data;
+  let url = settings.gist + "?cache-bust=" + randomUUID().toString();
+  const response = await axios.get(url, {
+    headers: { "Cache-Control": "no-cache" },
+  });
+  return response.data;
 }

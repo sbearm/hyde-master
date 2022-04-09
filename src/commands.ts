@@ -1,12 +1,12 @@
 import { Queue } from "discord-music-player";
 import { ChannelData, Client } from "discord.js";
-import { Video } from "./models";
+import { BotConfig, Video } from "./models";
 
 export async function play(
   client: any,
-  guildQueue: any,
+  guildQueue: Queue,
   settings: any,
-  botConfig: any,
+  botConfig: BotConfig,
   options: any = {}
 ) {
   let general = client.channels.cache.find(
