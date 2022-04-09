@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/samuelbearman/hyde-master#readme",
   "dependencies": {
+    "axios": "^0.26.1",
     "discord-music-player": "^8.3.1",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0"

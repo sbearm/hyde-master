@@ -1,9 +1,11 @@
 import { Queue } from "discord-music-player";
 import { Intents, Message, ChannelData, VoiceState } from "discord.js";
+import { play } from "./commands";
+import { getConfig } from "./config";
 import { BotConfig } from "./models";
 
 const { Player } = require("discord-music-player");
-const https = require("https");
+
 const Discord = require("discord.js");
 require("dotenv").config();
 
@@ -41,19 +43,10 @@ const player = new Player(client, {
 client.player = player;
 
 client.on("ready", () => {
-  https.get(settings.gist, (res: any) => {
-    let data: any[] = [];
-
-    res.on("data", (chunk: any) => {
-      data.push(chunk);
-    });
-
-    res.on("end", () => {
-      let config: BotConfig = JSON.parse(Buffer.concat(data).toString());
-      botConfig = config;
-      console.log("Ready to go");
-    });
+  getConfig(settings).then((data) => {
+    botConfig = JSON.parse(JSON.stringify(data));
   });
+  console.log("Ready to go");
 });
 
 client.on(
@@ -76,34 +69,29 @@ client.on(
 );
 
 client.on("messageCreate", async (message: Message) => {
+  let args = message.content.split(" ");
+
   if (message.channel.type == "DM" && message.author.id == settings.adminId) {
-
-    let general = client.channels.cache.find(
-      (channel: ChannelData) => channel.name === settings.channel
-    );
-
-    if (message.content === "play") {
-      if (!guildQueue) {
-        guildQueue = client.player.createQueue(general.guild.id, {
-          leaveOnStop: false,
-        });
-      }
-
-      await guildQueue.join(general);
-      guildQueue.setVolume(70);
-
-      let playUntil = botConfig.Videos[0];
-      await guildQueue.play(playUntil.Url, { timecode: true });
-
-      if (playUntil && playUntil.MsSeconds) {
-        setTimeout(function () {
-          guildQueue.stop();
-        }, playUntil.MsSeconds);
+    if (args[0] === "play") {
+      if (args[1]) {
+        let parsed = parseInt(args[1]);
+        let options = {
+          playIndex: parsed,
+        };
+        await play(client, guildQueue, settings, botConfig, options);
+      } else {
+        await play(client, guildQueue, settings, botConfig);
       }
     }
 
-    if (message.content === "stop") {
+    if (args[0] === "stop") {
       guildQueue.stop();
+    }
+
+    if (args[0] === "refresh") {
+      getConfig(settings).then((data) => {
+        botConfig = JSON.parse(JSON.stringify(data));
+      });
     }
   }
 });
